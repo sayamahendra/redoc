@@ -1,5 +1,5 @@
 {
-  "name": "redoc",
+  "name": "cobaredoc",
   "version": "2.0.0-rc.35",
   "description": "ReDoc",
   "repository": {
@@ -154,6 +154,7 @@
     "prop-types": "^15.7.2",
     "react-dropdown-aria": "^2.0.6",
     "react-tabs": "^3.1.1",
+    "redoc": "^2.0.0-rc.35",
     "slugify": "^1.4.4",
     "stickyfill": "^1.1.1",
     "swagger2openapi": "^6.2.1",

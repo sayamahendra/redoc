@@ -1,0 +1,426 @@
+openapi: 3.0.0
+servers:
+  - url: http://localhost:8181/
+  - url: http://68.183.227.86/
+  - url: https://209.97.165.5/
+info:
+  description: PT Inovasi Bakti Nusantara
+  version: "1.0.0"
+  title: IBN REST API
+tags:
+  - name: Generate Token
+  - name: PLN Prepaid
+  - name: PLN Nontaglis
+  - name: PLN Postpaid
+  - name: OVO
+  - name: Balance
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+paths:
+  /auth/realms/ibn/protocol/openid-connect/token:
+    post:
+      servers:
+        - url: http://68.183.227.86/
+      tags:
+        - Generate Token
+      summary: Generate Token User Keycloak
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  example: password
+                client_id:
+                  type: string
+                  example: ibnmobile
+                username:
+                  type: string
+                  example: ibn191
+                password:
+                  type: string
+                  example: 123456
+              required:
+                - grant_type
+                - client_id
+                - username
+                - password
+  /trx (Inquiry PLN Prepaid):
+    post:
+      servers:
+        - url: https://209.97.165.5/
+      tags:
+        - PLN Prepaid
+      summary: Inquiry PLN Prepaid
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99502
+                trxtype:
+                  type: integer
+                  example: 2100
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                amount:
+                  type: integer
+                  example: 500000
+                idpel:
+                  type: integer
+                  example: 54320012345
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - amount
+                - idpel
+  /trx (Payment PLN Prepaid):
+    post:
+      servers:
+        - url: https://209.97.165.5/
+      tags:
+        - PLN Prepaid
+      summary: Payment PLN Prepaid
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99502
+                trxtype:
+                  type: integer
+                  example: 2200
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                bit48:
+                  type: object
+                  example: 0000000543200123450543200123450 dev_w-54320012345 R1 1300 000000027501|54320012345|BKP-PREPAID|5f1134199a221|502750|-|500000
+                amount:
+                  type: integer
+                  example: 500000
+                idpel:
+                  type: integer
+                  example: 54320012345
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - idpel
+                - bit48
+                - amount
+  /trx (Inquiry PLN Nontaglis):
+    post:
+      tags:
+        - PLN Nontaglis
+      summary: Inquiry PLN Nontaglis
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99504
+                trxtype:
+                  type: integer
+                  example: 2100
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                idpel:
+                  type: integer
+                  example: 5437004444444
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - idpel
+  /trx (Payment PLN Nontaglis):
+    post:
+      tags:
+        - PLN Nontaglis
+      summary: Payment PLN Nontaglis
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99502
+                trxtype:
+                  type: integer
+                  example: 2200
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                idpel:
+                  type: integer
+                  example: 54320012345
+                bit62:
+                  type: object
+                  example: 00000000000000000000000000000000
+                bit48:
+                  type: object
+                  example: '00000005437004444444000PENYAMBUNGAN BARU 20200608 000000000000dev_w-5437004444444 00000000000000000005eddba73e8add00000 0000000000082731000000826810000000005000|5437004444444|BKP-NONTAGLIS|5eddba73e8add|8273100|8268100", "bit62": "00000000000000000000" '
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - idpel
+                - bit48
+                - bit62
+  /trx (Inquiry PLN Postpaid):
+    post:
+      tags:
+        - PLN Postpaid
+      summary: Inquiry PLN Postpaid
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99501
+                trxtype:
+                  type: integer
+                  example: 2100
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                idpel:
+                  type: integer
+                  example: 543100666666
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - idpel
+  /trx (Payment PLN Postpaid):
+    post:
+      tags:
+        - PLN Postpaid
+      summary: Payment PLN Postpaid
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99501
+                trxtype:
+                  type: integer
+                  example: 2200
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                bit48:
+                  type: object
+                  example: 00000005431006666666606 dev_w-543100666666 R1 450 000011000SEP19 000000060473000000000000000000000000000000000000000000000000000000000000000000000000000000000OKT19 000000069185000000000000000000000000000000000000000000000000000000000000000000000000000000000NOV19 000000065373000000000000000000000000000000000000000000000000000000000000000000000000000000000DES19 000000058839000000000000000000000000000000000000000000000000000000000000000000000000000000000|543100666666|BKP-POSTPAID|5edde07e053df|300870|SEP19 OKT19 NOV19 DES19|60473 69185 65373 58839|4|289870|36000
+                idpel:
+                  type: integer
+                  example: 543100666666
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - bit48
+                - idpel
+  /trx (Inquiry OVO):
+    post:
+      servers:
+        - url: https://209.97.165.5/
+      tags:
+        - OVO
+      summary: Inquiry OVO
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99515
+                trxtype:
+                  type: integer
+                  example: 2100
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                amount:
+                  type: integer
+                  example: 20000
+                idpel:
+                  type: integer
+                  example: 081285306100
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - idpel
+                - amount
+  /trx (Payment OVO):
+    post:
+      servers:
+        - url: https://209.97.165.5/
+      tags:
+        - OVO
+      summary: Payment OVO
+      description: Please delete the setence in parentheses in the URI before hit
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99515
+                trxtype:
+                  type: integer
+                  example: 2200
+                trxid:
+                  type: integer
+                  example: 1596530547
+                trxdate:
+                  type: integer
+                  example: 1596530547
+                amount:
+                  type: integer
+                  example: 20000
+                idpel:
+                  type: integer
+                  example: 081285306100
+                bit48:
+                  type: object
+                  example: 0000000 0812853061000 dev_w-081285306100 000000000001|081285306100|WK01-OVO20|5f06f3d367f56|20500|-|20500
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - amount
+                - idpel
+                - bit48
+  /saldo/cek:
+    post:
+      servers:
+        - url: https://209.97.165.5/
+      tags:
+        - Balance
+      summary: Check Balance
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
