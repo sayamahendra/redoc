@@ -1,8 +1,7 @@
 openapi: 3.0.0
 servers:
-  - url: http://localhost:8181/
-  - url: http://68.183.227.86/
   - url: https://209.97.165.5/
+  - url: http://68.183.227.86/
 info:
   description: |
     # Introduction
@@ -100,7 +99,7 @@ paths:
                   scope:
                     type: string
                     example: profile email
-                    description: application scope/permission granted to application
+                    description: Application scope/permission granted to application
       requestBody:
         required: true
         content:
@@ -159,6 +158,7 @@ paths:
 
             curl_close($curl);
             echo $response;
+
   /trx (Inquiry PLN Prepaid):
     post:
       servers:
@@ -166,7 +166,7 @@ paths:
       tags:
         - PLN Prepaid
       summary: Inquiry PLN Prepaid
-      description: This endpoint will return avaiable denomination and product prices for your transaction.
+      description: These request will return avaiable denomination and product prices for your transaction.
       security:
         - bearerAuth: []
       responses:
@@ -178,17 +178,17 @@ paths:
                 type: object
                 properties:
                   materialNumber:
-                    type: integer
-                    example: 54320012345
+                    type: string
+                    example: "54320012345"
                     description: Material Number
                   subscriberID:
-                    type: integer
-                    example: 54320012345
+                    type: string
+                    example: "54320012345"
                     description: Subscriber ID
                   noReff:
-                    type: integer
-                    example: 0
-                    description: No Refferal
+                    type: string
+                    example: "0"
+                    description: Reference Number
                   subsciberName:
                     type: string
                     example: dev_w-54320012345
@@ -198,17 +198,25 @@ paths:
                     example: R1
                     description: Segmentation
                   powerConsumingCategory:
-                    type: integer
-                    example: 1300
+                    type: string
+                    example: "1300"
                     description: Power Consuming Category
                   adminCharge:
-                    type: integer
-                    example: 2750
+                    type: string
+                    example: "2750"
                     description: Admin Charge
                   rc:
-                    type: integer
-                    example: 0000
-                    description: "`response code`"
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  bit48:
+                    type: string
+                    example: "0000000543200123450543200123450                                                                dev_w-54320012345        R1  1300     00000002750|54320012345|BKP-PREPAID|5f2a794046b36|502750|-|500000"
+                    description: Bit48, save this to proceed your transaction.
+                  bit62:
+                    type: string
+                    example: "00000000000000000000000000000000"
+                    description: Bit62
       requestBody:
         required: true
         content:
@@ -283,6 +291,7 @@ paths:
 
             curl_close($curl);
             echo $response;
+
   /trx (Payment PLN Prepaid):
     post:
       servers:
@@ -290,12 +299,77 @@ paths:
       tags:
         - PLN Prepaid
       summary: Payment PLN Prepaid
-      description: Use this
+      description: After hit the inquiry, you can proceed your transaction by these request.
       security:
         - bearerAuth: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: string
+                    example: "502750"
+                    description: Amount of your transaction include with admin charge.
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  materialNumber:
+                    type: string
+                    example: "54320012345"
+                    description: Material Number
+                  subscriberID:
+                    type: string
+                    example: "54320012345"
+                    description: Subscriber ID
+                  noReff:
+                    type: string
+                    example: 9DC306B18900463FABDA06A6EABAA047
+                    description: Reference Number
+                  subsciberName:
+                    type: string
+                    example: dev_w-54320012345
+                    description: Subscriber Name
+                  segmentation:
+                    type: string
+                    example: R1
+                    description: Segmentation
+                  powerConsumingCategory:
+                    type: string
+                    example: "1300"
+                    description: Power Consuming Category
+                  adminCharge:
+                    type: string
+                    example: "2750"
+                    description: Admin Charge
+                  meterai:
+                    type: string
+                    example: "0"
+                    description: Meterai
+                  ppn:
+                    type: string
+                    example: "0"
+                    description: PPN
+                  ppj:
+                    type: string
+                    example: "50000"
+                    description: PPJ
+                  angsuran:
+                    type: string
+                    example: "0"
+                    description: Angsuran
+                  kwh:
+                    type: string
+                    example: "125.1"
+                    description: kWh
+                  tokenNumber:
+                    type: string
+                    example: 00963034799151040465
+                    description: Token Number
       requestBody:
         required: true
         content:
@@ -306,24 +380,31 @@ paths:
                 prodid:
                   type: integer
                   example: 99502
+                  description: Product ID
                 trxtype:
                   type: integer
                   example: 2200
+                  description: Transaction type, `2200` are for Payment.
                 trxid:
                   type: integer
                   example: 1596530547
+                  description: Transaction ID
                 trxdate:
                   type: integer
                   example: 1596530547
+                  description: Transaction Date
                 bit48:
                   type: object
                   example: 0000000543200123450543200123450 dev_w-54320012345 R1 1300 000000027501|54320012345|BKP-PREPAID|5f1134199a221|502750|-|500000
+                  description: Bit48 from your inquiry.
                 amount:
                   type: integer
                   example: 500000
+                  description: Amount of Transaction
                 idpel:
                   type: integer
                   example: 54320012345
+                  description: Account number/ID
               required:
                 - prodid
                 - trxtype
@@ -365,17 +446,91 @@ paths:
 
             curl_close($curl);
             echo $response;
+
   /trx (Inquiry PLN Nontaglis):
     post:
       tags:
         - PLN Nontaglis
       summary: Inquiry PLN Nontaglis
-      description: Please delete the setence in parentheses in the URI before hit
+      description: There request will return avaiability of product. If transaction has been done before, it will return status of it's transaction.
       security:
         - bearerAuth: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  registrationNumber:
+                    type: string
+                    example: "5437004444444"
+                    description: Registration Number
+                  transactionCode:
+                    type: string
+                    example: "0000"
+                    description: Transaction Code
+                  transactionName:
+                    type: string
+                    example: "PENYAMBUNGAN BARU"
+                    description: Transaction Name
+                  registrationDate:
+                    type: string
+                    example: 06AUG20
+                    description: Registration Date
+                  expirationDate:
+                    type: string
+                    example: "        "
+                    description: Expiration Date
+                  subscriberID:
+                    type: string
+                    example: "000000000000"
+                    description: Subscriber ID
+                  subsciberName:
+                    type: string
+                    example: dev_w-5437004444444
+                    description: Subscriber Name
+                  serviceUnit:
+                    type: string
+                    example: "00000"
+                    description: Service Unit
+                  serviceUnitAddress:
+                    type: string
+                    example: "                                   "
+                    description: Service Unit Address
+                  serviceUnitPhone:
+                    type: string
+                    example: "               "
+                    description: "Service Unit Phone Number"
+                  transactionAmount:
+                    type: string
+                    example: "8273100"
+                    description: Transaction Amount
+                  rptag:
+                    type: string
+                    example: "8268100"
+                    description: Tagihan
+                  adminCharge:
+                    type: string
+                    example: "5000"
+                    description: Admin Charge
+                  bit48:
+                    type: string
+                    example: "00000005437004444444000PENYAMBUNGAN BARU        20200806        000000000000dev_w-5437004444444                                      00000000000000000005f2b7ec2b3b4300000                                                  0000000000082731000000826810000000005000|5437004444444|BKP-NONTAGLIS|5f2b7ec2b3b43|8273100|8268100"
+                    description: Bit48, save this to proceed your transaction.
+                  bit62:
+                    type: string
+                    example: "00000000000000000000"
+                    description: Bit62
+                  amount:
+                    type: string
+                    example: "8273100"
+                    description: Amount of your transaction
       requestBody:
         required: true
         content:
@@ -386,18 +541,23 @@ paths:
                 prodid:
                   type: integer
                   example: 99504
+                  description: Product ID
                 trxtype:
                   type: integer
                   example: 2100
+                  description: Transaction type, `2100` are for Inquiry.
                 trxid:
                   type: integer
                   example: 1596530547
+                  description: Transaction ID
                 trxdate:
                   type: integer
                   example: 1596530547
+                  description: Transaction Date
                 idpel:
                   type: integer
                   example: 5437004444444
+                  description: Account number/ID
               required:
                 - prodid
                 - trxtype
@@ -435,17 +595,99 @@ paths:
 
             curl_close($curl);
             echo $response;
+
   /trx (Payment PLN Nontaglis):
     post:
       tags:
         - PLN Nontaglis
       summary: Payment PLN Nontaglis
-      description: Please delete the setence in parentheses in the URI before hit
+      description: This endpoint
       security:
         - bearerAuth: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "Response Code`"
+                  registrationNumber:
+                    type: string
+                    example: "5437004444444"
+                    description: Registration Number
+                  transactionCode:
+                    type: string
+                    example: "000"
+                    description: Transaction Code
+                  transactionName:
+                    type: string
+                    example: "PENYAMBUNGAN BARU"
+                    description: Transaction Name
+                  registrationDate:
+                    type: string
+                    example: "14JAN20"
+                    description: Registration Date
+                  expirationDate:
+                    type: string
+                    example: "        "
+                    description: Expiration Date
+                  subscriberID:
+                    type: string
+                    example: "000000000000"
+                    description: Subscriber ID
+                  subsciberName:
+                    type: string
+                    example: "dev_w-5437004444444"
+                    description: Subscriber Name
+                  noReff:
+                    type: string
+                    example: "069E73EF81934DA1A20C6B3672745034"
+                    description: Reference Number
+                  serviceUnit:
+                    type: string
+                    example: "00000"
+                    description: Service Unit
+                  serviceUnitAddress:
+                    type: string
+                    example: "                                   "
+                    description: Service Unit Address
+                  serviceUnitPhone:
+                    type: string
+                    example: "               "
+                    description: Service Unit Phone
+                  transactionAmount:
+                    type: string
+                    example: "0"
+                    description: Transaction Amount
+                  rptag:
+                    type: string
+                    example: "8268100"
+                    description: Tagihan
+                  adminCharge:
+                    type: string
+                    example: "5000"
+                    description: Admin Charge
+                  bit48:
+                    type: string
+                    example: "5437004444444000PENYAMBUNGAN BARU        20200114        000000000000dev_w-5437004444444                                      069E73EF81934DA1A20C6B367274503400000                                                  000000000000000000 000826810000000005000|5437004444444|BKP-NONTAGLIS|5f2b7ec2b3b43|8273100|8268100"
+                    description: Bit48
+                  bit62:
+                    type: string
+                    example: "00000000000000000000"
+                    description: Bit62
+                  bit63:
+                    type: string
+                    example: "Informasi Hubungi Call Center 123 Atau Hub PLN Terdekat :. Powered by Bukopinet."
+                    description: Bit63
+                  amount:
+                    type: string
+                    example: "8273100"
+                    description: Amount of Transaction
       requestBody:
         required: true
         content:
@@ -456,24 +698,31 @@ paths:
                 prodid:
                   type: integer
                   example: 99502
+                  description: Product ID
                 trxtype:
                   type: integer
                   example: 2200
+                  description: Transaction type, `2200` are for Payment.
                 trxid:
                   type: integer
                   example: 1596530547
+                  description: Transaction ID
                 trxdate:
                   type: integer
                   example: 1596530547
+                  description: Transaction Date
                 idpel:
                   type: integer
                   example: 54320012345
+                  description: Account number/ID
                 bit62:
                   type: object
                   example: 00000000000000000000000000000000
+                  description: Bit62
                 bit48:
                   type: object
                   example: '00000005437004444444000PENYAMBUNGAN BARU 20200608 000000000000dev_w-5437004444444 00000000000000000005eddba73e8add00000 0000000000082731000000826810000000005000|5437004444444|BKP-NONTAGLIS|5eddba73e8add|8273100|8268100", "bit62": "00000000000000000000" '
+                  description: Bit48 from your inquiry.
               required:
                 - prodid
                 - trxtype
@@ -514,12 +763,13 @@ paths:
 
             curl_close($curl);
             echo $response;
+
   /trx (Inquiry PLN Postpaid):
     post:
       tags:
         - PLN Postpaid
       summary: Inquiry PLN Postpaid
-      description: Please delete the setence in parentheses in the URI before hit
+      description: This endpoint
       security:
         - bearerAuth: []
       responses:
@@ -535,18 +785,23 @@ paths:
                 prodid:
                   type: integer
                   example: 99501
+                  description: Product ID
                 trxtype:
                   type: integer
                   example: 2100
+                  description: Transaction type, `2100` are for Inquiry.
                 trxid:
                   type: integer
                   example: 1596530547
+                  description: Transaction ID
                 trxdate:
                   type: integer
                   example: 1596530547
+                  description: Transaction Date
                 idpel:
                   type: integer
                   example: 543100666666
+                  description: Account number/ID
               required:
                 - prodid
                 - trxtype
@@ -590,7 +845,7 @@ paths:
       tags:
         - PLN Postpaid
       summary: Payment PLN Postpaid
-      description: Please delete the setence in parentheses in the URI before hit
+      description: This endpoint
       security:
         - bearerAuth: []
       responses:
@@ -606,21 +861,27 @@ paths:
                 prodid:
                   type: integer
                   example: 99501
+                  description: Product ID
                 trxtype:
                   type: integer
                   example: 2200
+                  description: Transaction type, `2200` are for Payment.
                 trxid:
                   type: integer
                   example: 1596530547
+                  description: Transaction ID
                 trxdate:
                   type: integer
                   example: 1596530547
+                  description: Transaction Date
                 bit48:
                   type: object
                   example: 00000005431006666666606 dev_w-543100666666 R1 450 000011000SEP19 000000060473000000000000000000000000000000000000000000000000000000000000000000000000000000000OKT19 000000069185000000000000000000000000000000000000000000000000000000000000000000000000000000000NOV19 000000065373000000000000000000000000000000000000000000000000000000000000000000000000000000000DES19 000000058839000000000000000000000000000000000000000000000000000000000000000000000000000000000|543100666666|BKP-POSTPAID|5edde07e053df|300870|SEP19 OKT19 NOV19 DES19|60473 69185 65373 58839|4|289870|36000
+                  description: Bit48 from your inquiry.
                 idpel:
                   type: integer
                   example: 543100666666
+                  description: Account number/ID
               required:
                 - prodid
                 - trxtype
@@ -668,7 +929,7 @@ paths:
       tags:
         - OVO
       summary: Inquiry OVO
-      description: Please delete the setence in parentheses in the URI before hit
+      description: This endpoint
       security:
         - bearerAuth: []
       responses:
@@ -684,21 +945,27 @@ paths:
                 prodid:
                   type: integer
                   example: 99515
+                  description: Product ID
                 trxtype:
                   type: integer
                   example: 2100
+                  description: Transaction type, `2100` are for Inquiry.
                 trxid:
                   type: integer
                   example: 1596530547
+                  description: Transaction ID
                 trxdate:
                   type: integer
                   example: 1596530547
+                  description: Transaction Date
                 amount:
                   type: integer
                   example: 20000
+                  description: Amount of Transaction
                 idpel:
                   type: integer
                   example: 081285306100
+                  description: Account number/ID
               required:
                 - prodid
                 - trxtype
@@ -746,7 +1013,7 @@ paths:
       tags:
         - OVO
       summary: Payment OVO
-      description: Please delete the setence in parentheses in the URI before hit
+      description: This endpoint
       security:
         - bearerAuth: []
       responses:
@@ -762,24 +1029,31 @@ paths:
                 prodid:
                   type: integer
                   example: 99515
+                  description: Product ID
                 trxtype:
                   type: integer
                   example: 2200
+                  description: Transaction type, `2200` are for Payment.
                 trxid:
                   type: integer
                   example: 1596530547
+                  description: Transaction ID
                 trxdate:
                   type: integer
                   example: 1596530547
+                  description: Transaction Date
                 amount:
                   type: integer
                   example: 20000
+                  description: Amount of Transaction
                 idpel:
                   type: integer
                   example: 081285306100
+                  description: Account number/ID
                 bit48:
                   type: object
                   example: 0000000 0812853061000 dev_w-081285306100 000000000001|081285306100|WK01-OVO20|5f06f3d367f56|20500|-|20500
+                  description: Bit48 from your transaction.
               required:
                 - prodid
                 - trxtype
