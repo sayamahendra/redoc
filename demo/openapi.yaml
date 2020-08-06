@@ -16,20 +16,52 @@ info:
     # Authentication
       <b> Access Token </b><br>
       `access_token` is an opaque string token that identify the user of the API. This token is required each time an application call API.
-
     <SecurityDefinitions />
+
+    # Response Code
+      `Response Code` are included in response anytime you hit the API. Here is the list of the code:
+        
+      | RC     |                  Meaning                         |
+      |--------|--------------------------------------------------|
+      | 0000   | Transaction success                              |
+      | 0001   | Transaction in progress                          | 
+      | 0068   | Timeout from biller                              |
+      | 0005   | Undefined error                                  |
+      | 0006   | Blocked partner central                          |
+      | 0009   | Bill paid off                                    |
+      | 0012   | Transaction suspect                              |
+      | 0013   | Invalid amount                                   |
+      | 0014   | Subscriber ID unregistered on biller             |
+      | 0015   | Subscriber ID unregistered on biller             |
+      | 0016   | Disable user                                     |
+      | 0030   | Format message does not match spesifications     |
+      | 0031   | Unregistered bank                                |
+      | 0046   | Insuficcient balance                             |
+      | 0047   | The total kWh exceeds the maximum limit          |
+      | 0063   | No Payment                                       |
+      | 0068   | Timeout from biller                              |
+      | 0077   | Consument blocked. Please contact PLN.           |
+      | 0088   | The bill was paid in full                        |
+      | 0089   | No bills yet                                     |
+      | 0090   | Cut off                                          |
+      | 0091   | Transaction Failed                               |
+      | 1001   | Reset IDpel success                              |
+      | 9985   | Transaction has been done                        |
+      | 9992   | Billing reference expired. Please try again.     |
+      | 9997   | Proccess failed, BOD has not been done           |
+      | 9999   | BOD has not been done                            |
 
   version: 1.0.0
   title: IBN REST API
   x-logo:
     url: "https://siva.jsstatic.com/id/223751/images/logo/223751_logo_0_204989.jpg"
-    altText: Petstore logo
 tags:
   - name: Obtaining Access Token
   - name: PLN Prepaid
   - name: PLN Nontaglis
   - name: PLN Postpaid
   - name: OVO
+  - name: GoPay
   - name: Get Account Balance
 x-tagGroups:
   - name: Authentication
@@ -43,6 +75,9 @@ x-tagGroups:
   - name: OVO
     tags:
       - OVO
+  - name: GoPay
+    tags:
+      - GoPay
   - name: Balance
     tags:
       - Get Account Balance
@@ -514,7 +549,7 @@ paths:
                   rptag:
                     type: string
                     example: "8268100"
-                    description: Tagihan
+                    description: Bill Amount
                   adminCharge:
                     type: string
                     example: "5000"
@@ -601,7 +636,7 @@ paths:
       tags:
         - PLN Nontaglis
       summary: Payment PLN Nontaglis
-      description: This endpoint
+      description: After hit the inquiry, you can proceed your transaction by these request.
       security:
         - bearerAuth: []
       responses:
@@ -667,7 +702,7 @@ paths:
                   rptag:
                     type: string
                     example: "8268100"
-                    description: Tagihan
+                    description: Bill Amount
                   adminCharge:
                     type: string
                     example: "5000"
@@ -769,12 +804,61 @@ paths:
       tags:
         - PLN Postpaid
       summary: Inquiry PLN Postpaid
-      description: This endpoint
+      description: There request will return avaiability of product. If transaction has been done before, it will return status of it's transaction.
       security:
         - bearerAuth: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriberID:
+                    type: string
+                    example: "543100666666"
+                    description: Subscriber ID
+                  subsciberName:
+                    type: string
+                    example: "dev_w-543100666666"
+                    description: Subscriber Name
+                  billStatus:
+                    type: string
+                    example: "6"
+                    description: Bill Status
+                  segmentation:
+                    type: string
+                    example: "R1"
+                    description: Segmentation
+                  powerConsumingCategory:
+                    type: string
+                    example: "450"
+                    description: Power Consuming Category
+                  adminCharge:
+                    type: string
+                    example: "11000"
+                    description: Admin Charge
+                  amount:
+                    type: string
+                    example: "300870"
+                    description: Amount
+                  blth:
+                    type: string
+                    example: "SEP19 OKT19 NOV19 DES19"
+                    description: Arrear bills in month
+                  standMeter:
+                    type: string
+                    example: "00000000 - 00000000"
+                    description: Stand Meter
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code"
+                  bit48:
+                    type: string
+                    example: "0000000543100666666606                                dev_w-543100666666                           R1  450      000011000SEP19                 000000060473000000000000000000000000000000000000000000000000000000000000000000000000000000000OKT19                 000000069185000000000000000000000000000000000000000000000000000000000000000000000000000000000NOV19                 000000065373000000000000000000000000000000000000000000000000000000000000000000000000000000000DES19                 000000058839000000000000000000000000000000000000000000000000000000000000000000000000000000000|543100666666|BKP-POSTPAID|5f2ba2dc5403d|300870|SEP19 OKT19 NOV19 DES19|60473 69185 65373 58839|4|289870|36000"
+                    description: Bit48
       requestBody:
         required: true
         content:
@@ -845,12 +929,61 @@ paths:
       tags:
         - PLN Postpaid
       summary: Payment PLN Postpaid
-      description: This endpoint
+      description: After hit the inquiry, you can proceed your transaction by these request.
       security:
         - bearerAuth: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriberID:
+                    type: string
+                    example: "543100666666"
+                    description: Subscriber ID
+                  subscriberName:
+                    type: string
+                    example: "dev_w-543100666666"
+                    description: Subscriber Name
+                  billStatus:
+                    type: string
+                    example: "6"
+                    description: Bill Status
+                  segmentation:
+                    type: string
+                    example: "R1"
+                    description: Segmentation
+                  powerConsumingCategory:
+                    type: string
+                    example: "450"
+                    description: Power Consuming Category
+                  adminCharge:
+                    type: string
+                    example: "11000"
+                    description: Admin Charge
+                  amount:
+                    type: string
+                    example: "300870"
+                    description: Amount of Transaction
+                  blth:
+                    type: string
+                    example: "SEP19 OKT19 NOV19 DES19"
+                    description: Arrear bills in month
+                  standMeter:
+                    type: string
+                    example: "00000000 - 00000000"
+                    description: Stand Meter
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  bit48:
+                    type: string
+                    example: "0000000543100666666606                                dev_w-543100666666                           R1  450      000011000SEP19                 000000060473000000000000000000000000000000000000000000000000000000000000000000000000000000000OKT19                 000000069185000000000000000000000000000000000000000000000000000000000000000000000000000000000NOV19                 000000065373000000000000000000000000000000000000000000000000000000000000000000000000000000000DES19                 000000058839000000000000000000000000000000000000000000000000000000000000000000000000000000000|543100666666|BKP-POSTPAID|5f2baa61dbf13|300870|SEP19 OKT19 NOV19 DES19|60473 69185 65373 58839|4|289870|36000"
+                    description: Bit48
       requestBody:
         required: true
         content:
@@ -929,12 +1062,57 @@ paths:
       tags:
         - OVO
       summary: Inquiry OVO
-      description: This endpoint
+      description: These request will return avaiable denomination and product prices for your transaction.
       security:
         - bearerAuth: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  materialNumber:
+                    type: string
+                    example: "           "
+                    description: Material Number
+                  subscriberID:
+                    type: string
+                    example: "081285306100"
+                    description: Subscriber ID
+                  noReff:
+                    type: string
+                    example: "0"
+                    description: Reference Number
+                  subsciberName:
+                    type: string
+                    example: dev_w-081285306100
+                    description: Subscriber Name
+                  segmentation:
+                    type: string
+                    example: ""
+                    description: Segmentation
+                  powerConsumingCategory:
+                    type: string
+                    example: ""
+                    description: Power Consuming Category
+                  adminCharge:
+                    type: string
+                    example: "0"
+                    description: Admin Charge
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  bit48:
+                    type: string
+                    example: "0000000           0812853061000                                                                dev_w-081285306100                    00000000000|081285306100|WK01-OVO20|5f2bb925e928f|20500|-|20500"
+                    description: Bit48, save this to proceed your transaction.
+                  bit62:
+                    type: string
+                    example: "00000000000000000000000000000000"
+                    description: Bit62
       requestBody:
         required: true
         content:
@@ -1013,12 +1191,77 @@ paths:
       tags:
         - OVO
       summary: Payment OVO
-      description: This endpoint
+      description: After hit the inquiry, you can proceed your transaction by these request.
       security:
         - bearerAuth: []
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: string
+                    example: "20500"
+                    description: Amount of your transaction include with admin charge.
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  materialNumber:
+                    type: string
+                    example: ""
+                    description: Material Number
+                  subscriberID:
+                    type: string
+                    example: "81285306100"
+                    description: Subscriber ID
+                  noReff:
+                    type: string
+                    example: "20011614285622854441"
+                    description: Reference Number
+                  subsciberName:
+                    type: string
+                    example: dev_w-081285306100
+                    description: Subscriber Name
+                  segmentation:
+                    type: string
+                    example: ""
+                    description: Segmentation
+                  powerConsumingCategory:
+                    type: string
+                    example: ""
+                    description: Power Consuming Category
+                  adminCharge:
+                    type: string
+                    example: "0"
+                    description: Admin Charge
+                  meterai:
+                    type: string
+                    example: ""
+                    description: Meterai
+                  ppn:
+                    type: string
+                    example: ""
+                    description: PPN
+                  ppj:
+                    type: string
+                    example: ""
+                    description: PPJ
+                  angsuran:
+                    type: string
+                    example: ""
+                    description: Angsuran
+                  kwh:
+                    type: string
+                    example: ""
+                    description: kWh
+                  tokenNumber:
+                    type: string
+                    example: ""
+                    description: Token Number
       requestBody:
         required: true
         content:
@@ -1053,7 +1296,7 @@ paths:
                 bit48:
                   type: object
                   example: 0000000 0812853061000 dev_w-081285306100 000000000001|081285306100|WK01-OVO20|5f06f3d367f56|20500|-|20500
-                  description: Bit48 from your transaction.
+                  description: Bit48 from your inquiry.
               required:
                 - prodid
                 - trxtype
@@ -1096,6 +1339,290 @@ paths:
             curl_close($curl);
             echo $response;
 
+  /trx (Inquiry GoPay):
+    post:
+      servers:
+        - url: https://209.97.165.5/
+      tags:
+        - GoPay
+      summary: Inquiry GoPay
+      description: These request will return avaiable denomination and product prices for your transaction.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  materialNumber:
+                    type: string
+                    example: "           "
+                    description: Material Number
+                  subscriberID:
+                    type: string
+                    example: "081110001100"
+                    description: Subscriber ID
+                  noReff:
+                    type: string
+                    example: "0"
+                    description: Reference Number
+                  subsciberName:
+                    type: string
+                    example: dev_w-081110001100
+                    description: Subscriber Name
+                  segmentation:
+                    type: string
+                    example: ""
+                    description: Segmentation
+                  powerConsumingCategory:
+                    type: string
+                    example: ""
+                    description: Power Consuming Category
+                  adminCharge:
+                    type: string
+                    example: "2000"
+                    description: Admin Charge
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  bit48:
+                    type: string
+                    example: "0000000           0811100011000                                                                dev_w-081110001100                    00000002000|081110001100|WK01-GJC20|5f2bc5c8b339e|22000|-|20000"
+                    description: Bit48, save this to proceed your transaction.
+                  bit62:
+                    type: string
+                    example: "00000000000000000000000000000000"
+                    description: Bit62
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99516
+                  description: Product ID
+                trxtype:
+                  type: integer
+                  example: 2100
+                  description: Transaction type, `2100` are for Inquiry.
+                trxid:
+                  type: integer
+                  example: 1596703525
+                  description: Transaction ID
+                trxdate:
+                  type: integer
+                  example: 1596703525
+                  description: Transaction Date
+                amount:
+                  type: integer
+                  example: 20000
+                  description: Amount of Transaction
+                idpel:
+                  type: integer
+                  example: 081110001100
+                  description: Account number/ID
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - idpel
+                - amount
+      x-codeSamples:
+        - lang: "cURL"
+          source: |
+            curl --location --request POST 'https://209.97.165.5/trx' \
+            --data-urlencode 'prodid=99516' \
+            --data-urlencode 'trxtype=2100' \
+            --data-urlencode 'trxid=1596703657' \
+            --data-urlencode 'trxdate=1596703657' \
+            --data-urlencode 'amount=20000' \
+            --data-urlencode 'idpel=081110001100'
+        - lang: "PHP"
+          source: |
+            <?php
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => "https://209.97.165.5/trx",
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => "",
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => "POST",
+              CURLOPT_POSTFIELDS => "prodid=99516&trxtype=2100&trxid=1596703527&trxdate=1596703527&amount=20000&idpel=081110001100",
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            echo $response;
+
+  /trx (Payment GoPay):
+    post:
+      servers:
+        - url: https://209.97.165.5/
+      tags:
+        - GoPay
+      summary: Payment GoPay
+      description: After hit the inquiry, you can proceed your transaction by these request.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount:
+                    type: string
+                    example: "22000"
+                    description: Amount of your transaction include with admin charge.
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  materialNumber:
+                    type: string
+                    example: ""
+                    description: Material Number
+                  subscriberID:
+                    type: string
+                    example: "81110001100"
+                    description: Subscriber ID
+                  noReff:
+                    type: string
+                    example: 5f2bbd2540cf1
+                    description: Reference Number
+                  subsciberName:
+                    type: string
+                    example: dev_w-081110001100
+                    description: Subscriber Name
+                  segmentation:
+                    type: string
+                    example: ""
+                    description: Segmentation
+                  powerConsumingCategory:
+                    type: string
+                    example: ""
+                    description: Power Consuming Category
+                  adminCharge:
+                    type: string
+                    example: "2000"
+                    description: Admin Charge
+                  meterai:
+                    type: string
+                    example: ""
+                    description: Meterai
+                  ppn:
+                    type: string
+                    example: ""
+                    description: PPN
+                  ppj:
+                    type: string
+                    example: ""
+                    description: PPJ
+                  angsuran:
+                    type: string
+                    example: ""
+                    description: Angsuran
+                  kwh:
+                    type: string
+                    example: ""
+                    description: kWh
+                  tokenNumber:
+                    type: string
+                    example: ""
+                    description: Token Number
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prodid:
+                  type: integer
+                  example: 99516
+                  description: Product ID
+                trxtype:
+                  type: integer
+                  example: 2200
+                  description: Transaction type, `2200` are for Payment.
+                trxid:
+                  type: integer
+                  example: 1596703525
+                  description: Transaction ID
+                trxdate:
+                  type: integer
+                  example: 1596703525
+                  description: Transaction Date
+                amount:
+                  type: integer
+                  example: 20000
+                  description: Amount of Transaction
+                idpel:
+                  type: integer
+                  example: 0811100011000
+                  description: Account number/ID
+                bit48:
+                  type: object
+                  example: 0000000 0811100011000 dev_w-081110001100 000000020001|081110001100|WK01-GJC20|5f2bbd2540cf1|22000|-|20000
+                  description: Bit48 from your inquiry.
+              required:
+                - prodid
+                - trxtype
+                - trxid
+                - trxdate
+                - amount
+                - idpel
+                - bit48
+      x-codeSamples:
+        - lang: "cURL"
+          source: |
+            curl --location --request POST 'https://209.97.165.5/trx' \
+            --data-urlencode 'prodid=99516' \
+            --data-urlencode 'trxtype=2200' \
+            --data-urlencode 'trxid=1596703657' \
+            --data-urlencode 'trxdate=1596703657' \
+            --data-urlencode 'amount=20000' \
+            --data-urlencode 'idpel=0811100011000' \
+            --data-urlencode 'bit48=0000000           0811100011000                                                                dev_w-081110001100                    000000020001|081110001100|WK01-GJC20|5f2bbd2540cf1|22000|-|20000'
+        - lang: "PHP"
+          source: |
+            <?php
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => "https://209.97.165.5/trx",
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => "",
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => "POST",
+              CURLOPT_POSTFIELDS => "prodid=99516&trxtype=2200&trxid=1596703800&trxdate=1596703800&amount=20000&idpel=0811100011000&bit48=0000000%20%20%20%20%20%20%20%20%20%20%200811100011000%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20dev_w-081110001100%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20000000020001%7C081110001100%7CWK01-GJC20%7C5f2bbd2540cf1%7C22000%7C-%7C20000",
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            echo $response;
+
   /saldo/cek:
     post:
       servers:
@@ -1109,6 +1636,19 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rc:
+                    type: string
+                    example: "0000"
+                    description: "`Response Code`"
+                  saldo:
+                    type: string
+                    example: "28117750"
+                    description: Your Balance
       x-codeSamples:
         - lang: "cURL"
           source: |
